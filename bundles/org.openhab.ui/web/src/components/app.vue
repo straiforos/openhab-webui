@@ -66,6 +66,10 @@
                             :class="{ currentsection: currentUrl.indexOf('/settings/schedule') >= 0 }">
                 <f7-icon slot="media" f7="calendar" color="gray" />
               </f7-list-item>
+              <f7-list-item link="/settings/access-control/" title="Access control" view=".view-main" panel-close :animate="false" no-chevron
+                            :class="{ currentsection: currentUrl.indexOf('/settings/access-control') >= 0 }">
+                <f7-icon slot="media" f7="calendar" color="gray" />
+              </f7-list-item>
             </ul>
           </li>
 
@@ -371,6 +375,7 @@ export default {
     }
   },
   computed: {
+    // never use this method isAdmin
     isAdmin () {
       if (!this.$store.getters.apiEndpoint('auth')) return true
       return this.ready && this.user && this.user.roles && this.user.roles.indexOf('administrator') >= 0
@@ -419,6 +424,12 @@ export default {
         })
         .then((rootResponse) => {
           // store the REST API services present on the system
+          if (!this.user) {
+            this.tryExchangeAuthorizationCode()
+            this.user = this.$store.getters.user
+          }
+          console.log('ROOT RESPONSE')
+          console.log(rootResponse)
           this.$store.dispatch('loadRootResource', { rootResponse })
           this.updateLocale()
           if (!this.$store.getters.apiEndpoint('auth')) this.$store.commit('setNoAuth', true)
@@ -439,6 +450,8 @@ export default {
             dayjsLocalePromise
           ])
         }).then((data) => {
+          console.log('try to debug')
+          console.log(data)
           // store the pages & widgets
           this.$store.commit('setPages', { pages: data[0] })
           this.$store.commit('setWidgets', { widgets: data[1] })
@@ -598,7 +611,7 @@ export default {
 
         this.loggedIn = true
       }
-
+      console.log('TRY EXCHANGE AUTHORIZATIONTOKEN')
       if (!this.user) {
         this.tryExchangeAuthorizationCode().then((user) => {
           this.loggedIn = true

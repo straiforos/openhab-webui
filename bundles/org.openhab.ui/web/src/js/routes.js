@@ -46,6 +46,8 @@ const RuleEditPage = () => import(/* webpackChunkName: "admin-rules" */ '../page
 const ScriptEditPage = () => import(/* webpackChunkName: "admin-rules" */ '../pages/settings/rules/script/script-edit.vue')
 const SchedulePage = () => import(/* webpackChunkName: "admin-schedule" */ '../pages/settings/schedule/schedule.vue')
 
+const RolesPage = () => import(/* webpackChunkName: "admin-roles-management" */ '../pages/settings/access-control/roles-management.vue')
+
 const DeveloperToolsPage = () => import(/* webpackChunkName: "admin-devtools" */ '../pages/developer/developer-tools.vue')
 const WidgetsListPage = () => import(/* webpackChunkName: "admin-devtools" */ '../pages/developer/widgets/widget-list.vue')
 const WidgetEditPage = () => import(/* webpackChunkName: "admin-devtools" */ '../pages/developer/widgets/widget-edit.vue')
@@ -233,6 +235,10 @@ export default [
             async: loadAsync(RuleEditPage, { createMode: true, schedule: true })
           }
         ]
+      },
+      {
+        path: 'access-control',
+        async: loadAsync(RolesPage)
       },
       {
         path: 'addons',
