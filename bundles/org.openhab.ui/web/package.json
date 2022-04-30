@@ -63,6 +63,7 @@
   "dependencies": {
     "@blockly/field-slider": "^2.1.10",
     "blockly": "^6.20210701.0",
+    "chokidar": "^3.5.3",
     "cronstrue": "^1.100.0",
     "dayjs": "^1.9.6",
     "dom7": "^2.1.5",
