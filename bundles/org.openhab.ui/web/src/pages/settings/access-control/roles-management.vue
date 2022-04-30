@@ -218,7 +218,7 @@ export default {
     }
   },
   created () {
-
+     
   },
   computed: {
     canAddChildren () {
@@ -275,15 +275,41 @@ export default {
       }
     },
     save (stay) {
+
+      console.log('Access control')
       const promise = this.$oh.api.get('/rest/accessControl')
       promise.then((data) => {
         console.log(data)
       })
-      console.log('Roles')
-      console.log(this.$oh.api.get('/rest/accessControl/role'))
-      console.log('Items')
-      console.log(this.$oh.api.get('/rest/items'))
+      /*console.log('HEHEHEH Role')
+      const promise2 = this.$oh.api.get('/rest/accessControl/role')
+      promise2.then((data) => {
+        console.log(data)
+      })*/
 
+      /*
+      console.log('Items')
+      const promise3 = this.$oh.api.get('/rest/items')
+      promise3.then((data) => {
+        console.log(data)
+      }) */
+
+         
+     /* const promiseRoles = new Promise(() => {
+        this.$oh.api.get('/rest/accessControl/role')
+      }) 
+
+      const promiseAccessControl = new Promise(() => {
+        this.$oh.api.get('/rest/accessControl')
+      })
+   
+      const promiseItems = new Promise(() => {
+        this.$oh.api.get('/rest/items')
+      })
+      //
+      Promise.all([promiseAccessControl, promiseItems]).then(values => console.log(values))*/
+      
+      
       /* if (!this.sitemap.uid) {
         this.$f7.dialog.alert('Please give an ID to the sitemap')
         return
