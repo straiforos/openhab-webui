@@ -291,11 +291,19 @@ export default {
         groups: ["group1", "group2"],
         roles: ["role1","role2","role3"]
       }
+      //application/json
+      this.$oh.api.put('/rest/accessControl/put',accessControl).then((data) => {
+        console.log(data)
+      })
       //,
       const promise2 = this.$oh.api.put('/rest/accessControl', accessControl)
       promise2.then((data) => {
         console.log(data)
       })
+
+      this.$oh.api.put('/rest/items/gRoom1Sensor', {}).then((data) => {
+           console.log(data)
+          })
       /*console.log('HEHEHEH Role')
       const promise2 = this.$oh.api.get('/rest/accessControl/role')
       promise2.then((data) => {
