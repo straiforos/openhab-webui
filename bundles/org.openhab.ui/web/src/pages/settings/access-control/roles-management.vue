@@ -277,7 +277,7 @@ export default {
     save (stay) {
 
       console.log('Access control')
-      const promise = this.$oh.api.get('/rest/accessControl')
+      const promise = this.$oh.api.getPlain('/rest/accessControl/role', 'text/plain')
       promise.then((data) => {
         console.log(data)
       })
