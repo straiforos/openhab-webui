@@ -284,13 +284,19 @@ export default {
       })
       let accessControl;
       accessControl = {
-        userAccessControlSet:{
-          name: "nico",
-          roles: ["role1", "role2"],
-          groups: ["group1"]
-        },
-        groups: ["group1", "group2"],
-        roles: ["role1","role2","role3"]
+        userAccessControlSet:[
+          {
+            name: "nico",
+            roles: ["role1", "role2"],
+            groups: ["group1"]
+          },
+          {
+            name: "nico2",
+            roles: ["role1", "role2"],
+            groups: ["group1"]
+          }],
+        groups: [{group: "group1", roles:["role1", "role2"]}, {group:["role3"], roles:["role1","role2"]}],
+        roles: [{role:"role1", items:["item1,item2"]},{role:"role2", items:["item3,item4"]},{role:"role3", items:["item3,item2"]}]
       }
       //application/json
       this.$oh.api.put('/rest/accessControl/put',{}).then((data) => {
