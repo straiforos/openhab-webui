@@ -214,7 +214,8 @@ export default {
         { type: 'Image', icon: 'photo' },
         { type: 'Video', icon: 'videocam' }
       ],
-      linkableWidgetTypes: ['Sitemap', 'Text', 'Frame', 'Group', 'Image']
+      linkableWidgetTypes: ['Sitemap', 'Text', 'Frame', 'Group', 'Image'],
+      accessControl:{}
     }
   },
   created () {
@@ -277,9 +278,9 @@ export default {
     save (stay) {
 
       console.log('Access control')
-      const promise = this.$oh.api.getPlain('/rest/accessControl/role', 'text/plain')
-      promise.then((data) => {
-        console.log(data)
+      const promise = this.$oh.api.getPlain('/rest/accessControl', 'text/plain')
+      promise.then((data1) => {
+        console.log(data1)
       })
       let accessControl;
       accessControl = {
@@ -292,18 +293,27 @@ export default {
         roles: ["role1","role2","role3"]
       }
       //application/json
-      this.$oh.api.put('/rest/accessControl/put',accessControl).then((data) => {
+      this.$oh.api.put('/rest/accessControl/put',{}).then((data) => {
+        console.log('put2')
         console.log(data)
       })
+      this.$set(this, 'accessControl', Object.assign({}, accessControl))
       //,
-      const promise2 = this.$oh.api.put('/rest/accessControl', accessControl)
+      const promise2 = this.$oh.api.put('/rest/accessControl/put', this.accessControl)
       promise2.then((data) => {
+        console.log('put')
         console.log(data)
       })
 
       this.$oh.api.put('/rest/items/gRoom1Sensor', {}).then((data) => {
            console.log(data)
           })
+
+      console.log('PUT PLAIN THINGS')
+      this.$oh.api.putPlain('/rest/accessControl/enable', JSON.stringify(accessControl)).then( (data) => {
+            console.log(data)
+        }
+      )
       /*console.log('HEHEHEH Role')
       const promise2 = this.$oh.api.get('/rest/accessControl/role')
       promise2.then((data) => {
