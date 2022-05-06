@@ -1,287 +1,150 @@
 <template>
-  <f7-page @page:afterin="onPageAfterIn" @page:beforeout="onPageBeforeOut">
+  <f7-page >
     <f7-navbar :title="'Access Control'" back-link="Back" no-hairline>
       <f7-nav-right>
-        <f7-link @click="save()" v-if="$theme.md" icon-md="material:save" icon-only />
-        <f7-link @click="save()" v-if="!$theme.md">
-          Save<span v-if="$device.desktop">&nbsp;(Ctrl-S)</span>
-        </f7-link>
+
       </f7-nav-right>
     </f7-navbar>
     <f7-toolbar tabbar position="top">
-      <f7-link @click="currentTab = 'tree'" :tab-link-active="currentTab === 'tree'" class="tab-link">
+      <f7-link class="tab-link">
         Design
       </f7-link>
-      <f7-link @click="currentTab = 'code'" :tab-link-active="currentTab === 'code'" class="tab-link">
+      <f7-link  class="tab-link">
         Code
       </f7-link>
-    </f7-toolbar>
-    <f7-toolbar bottom class="toolbar-details" v-if="currentTab === 'tree'">
-      <f7-link :disabled="selectedWidget != null" class="left" @click="selectedWidget = null">
-        Clear
+      <f7-link @click="save()">
+        Save
       </f7-link>
-      <f7-link class="right details-link padding-right" ref="detailsLink" @click="detailsOpened = true" icon-f7="chevron_up" />
+
     </f7-toolbar>
-    <f7-tabs class="sitemap-editor-tabs">
-      <f7-tab class="design" id="tree" @tab:show="() => this.currentTab = 'tree'" :tab-active="currentTab === 'tree'">
-        <f7-block v-if="!ready" class="text-align-center">
-          <f7-preloader />
-          <div>Loading...</div>
-        </f7-block>
-        <f7-block v-else class="sitemap-tree-wrapper" :class="{ 'sheet-opened' : detailsOpened }">
-          <f7-row v-if="currentTab === 'tree'">
-            <f7-col width="100" medium="50">
-              <f7-block strong class="sitemap-tree" no-gap @click.native="clearSelection">
-                <f7-treeview>
-                  <sitemap-treeview-item :widget="sitemap" @selected="selectWidget" :selected="selectedWidget" />
-                </f7-treeview>
-              </f7-block>
-            </f7-col>
-            <f7-col width="100" medium="50" class="details-pane">
-              <f7-block v-if="selectedWidget" no-gap>
-                <widget-details :widget="selectedWidget" :createMode="createMode" @remove="removeWidget" @movedown="moveWidgetDown" @moveup="moveWidgetUp" />
-              </f7-block>
-              <f7-block v-else>
-                <div class="padding text-align-center">
-                  Nothing selected
-                </div>
-              </f7-block>
-              <f7-block v-if="selectedWidget && ['Switch', 'Selection'].indexOf(selectedWidget.component) >= 0">
-                <div><f7-block-title>Mappings</f7-block-title></div>
-                <mapping-details :widget="selectedWidget" />
-              </f7-block>
-            </f7-col>
-          </f7-row>
-        </f7-block>
+    <f7-row>
+      <f7-col-xs-9  class="left_page">
+        <form @submit.prevent="addGroup">
+          <input v-model="newGroup" placeholder="Creat a new group"> </input>
+          <button>Creat</button>
+        </form>
+        <form @submit.prevent="addRole">
+          <input v-model="newRole" placeholder="Creat a new role"> </input>
+          <button>Creat</button>
+        </form>
+      </f7-col-xs-9>
+      <f7-col-xs-3  class="right_page">
+        <f7-block-title>Available users</f7-block-title>
+        <f7-list simple-list title="" v-for="user in this.accessControl.userAccessControlSet">
+          <f7-list-item > {{ user.name }} </f7-list-item>
+        </f7-list>
+        <f7-block-title>Available Groups</f7-block-title>
+        <f7-list simple-list title="" v-for="group in this.accessControl.groups">
+          <f7-list-item > {{ group.group }} </f7-list-item>
+        </f7-list>
+        <f7-block-title>Available Roles</f7-block-title>
+        <f7-list simple-list title="" v-for="role in this.accessControl.roles">
+          <f7-list-item > {{ role.role }} </f7-list-item>
+        </f7-list>
 
-        <f7-actions ref="widgetTypeSelection" id="widget-type-selection" :grid="true">
-          <f7-actions-group>
-            <f7-actions-button v-for="widgetType in widgetTypes" :key="widgetType.type" @click="addWidget(widgetType.type)">
-              <f7-icon :f7="widgetType.icon" slot="media" />
-              <span>{{ widgetType.type }}</span>
-            </f7-actions-button>
-          </f7-actions-group>
-        </f7-actions>
-      </f7-tab>
-      <f7-tab id="code" @tab:show="() => { this.currentTab = 'code' }" :tab-active="currentTab === 'code'">
-        <sitemap-code v-if="currentTab === 'code'" :sitemap="sitemap" @updated="(value) => update(value)" />
-      </f7-tab>
-    </f7-tabs>
+      </f7-col-xs-3>
+    </f7-row>
 
-    <f7-fab class="add-to-sitemap-fab" v-if="canAddChildren" position="right-bottom" slot="fixed" color="blue" @click="$refs.widgetTypeSelection.open()">
-      <f7-icon ios="f7:plus" md="material:add" aurora="f7:plus" />
-      <f7-icon ios="f7:multiply" md="material:close" aurora="f7:multiply" />
-    </f7-fab>
 
-    <f7-sheet class="sitemap-details-sheet" :backdrop="false" :close-on-escape="true" :opened="detailsOpened" @sheet:closed="detailsOpened = false">
-      <f7-page>
-        <f7-toolbar tabbar bottom>
-          <f7-link class="padding-left padding-right" :tab-link-active="detailsTab === 'widget'" @click="detailsTab = 'widget'">
-            Widget
-          </f7-link>
-          <f7-link class="padding-left padding-right" :tab-link-active="detailsTab === 'mappings'" @click="detailsTab = 'mappings'">
-            Mappings
-          </f7-link>
-          <div class="right">
-            <f7-link sheet-close class="padding-right">
-              <f7-icon f7="chevron_down" />
-            </f7-link>
-          </div>
-        </f7-toolbar>
-        <f7-block style="margin-bottom: 6rem" v-if="selectedWidget && detailsTab === 'widget'">
-          <widget-details :widget="selectedWidget" :createMode="createMode" @remove="removeWidget" @movedown="moveWidgetDown" @moveup="moveWidgetUp" />
-        </f7-block>
-        <f7-block style="margin-bottom: 6rem" v-if="selectedWidget && detailsTab === 'mappings' && ['Switch', 'Selection'].indexOf(selectedWidget.component) >= 0">
-          <mapping-details :widget="selectedWidget" />
-        </f7-block>
-      </f7-page>
-    </f7-sheet>
+
   </f7-page>
 </template>
 
 <style lang="stylus">
-.sitemap-editor-tabs
-  height calc(100%)
-  overflow hidden
-  .tab
-    height 100%
-  .design
-    --f7-grid-gap 0px
-    height calc(100% - var(--f7-toolbar-height))
 
-.sitemap-tree-wrapper
-  padding 0
-  margin-bottom 0
-.sitemap-tree
-  padding 0
-  border-right 1px solid var(--f7-block-strong-border-color)
-  .treeview
-    --f7-treeview-item-height 40px
-    .treeview-item-label
-      font-size 10pt
-      white-space nowrap
-      overflow-x hidden
-    .subtitle
-      font-size 8pt
-      color var(--f7-list-item-footer-text-color)
-.sitemap-details-sheet
-  .toolbar
-    --f7-theme-color var(--f7-color-blue)
-    --f7-theme-color-rgb var(--f7-color-blue-rgb)
-  z-index 10900
-.md .sitemap-details-sheet .toolbar .link
-  width 35%
+.left_tool_bar
+  width
 
-@media (min-width: 768px)
-  .sitemap-tree-wrapper
-    height 100%
-    .row
-      height 100%
-      .col-100
-        height 100%
-        overflow auto
-        .sitemap-tree
-          min-height 100%
-          margin 0
-          height auto
-      .details-pane
-        padding-top 0
-        .block
-          margin-top 0
-  .toolbar-details
-    .details-link
-      visibility hidden !important
-  .add-to-sitemap-fab
-    visibility hidden !important
+.left_page
+  height 100%
+  width 70%
+.right_page
+  height 100%
+  width 30%
 
-@media (max-width: 767px)
-  .details-pane
-    display none
-  .sitemap-tree-wrapper.sheet-opened
-    margin-bottom var(--f7-sheet-height)
-  .details-sheet
-    height calc(1.4*var(--f7-sheet-height))
 </style>
 
 <script>
-import SitemapCode from '@/components/pagedesigner/sitemap/sitemap-code.vue'
-// import WidgetDetails from '@/components/pagedesigner/sitemap/widget-details.vue'
-// import MappingDetails from '@/components/pagedesigner/sitemap/mapping-details.vue'
-import DirtyMixin from '../dirty-mixin'
+
 
 export default {
-  mixins: [DirtyMixin],
-  components: {
-    SitemapCode
-    // WidgetDetails,
-    // MappingDetails
-  },
-  props: ['createMode', 'uid'],
   data () {
     return {
-      ready: true,
-      loading: false,
-      sitemap: {
-        uid: 'page_' + this.$f7.utils.id(),
-        component: 'Role',
-        config: {
-          label: 'New Role'
-        },
-        tags: [],
-        slots: { widgets: [] }
+      accessControl: {
+        userAccessControlSet:[
+          {
+            name: "nico",
+            roles: ["role1", "role2"],
+            groups: ["group1"]
+          }],
+        groups: [{group: "group1", roles:["role1", "role2"]}, {group:"group3", roles:["role1","role2"]}],
+        roles: [{role:"role1", items:["item1","item2"]},{role:"role2", items:["item3","item4"]},{role:"role3", items:["item3","item2"]}]
       },
-      selectedWidget: null,
-      selectedWidgetParent: null,
-      previousSelection: null,
-      detailsOpened: false,
-      detailsTab: 'widget',
-      currentTab: 'tree',
-      eventSource: null,
-      widgetTypes: [
-        { type: 'Text', icon: 'textformat' },
-        { type: 'Switch', icon: 'power' },
-        { type: 'Selection', icon: 'text_justify' },
-        { type: 'Slider', icon: 'slider_horizontal_3' },
-        { type: 'Frame', icon: 'macwindow' },
-        { type: 'Setpoint', icon: 'plus_slash_minus' },
-        { type: 'Default', icon: 'rectangle' },
-        { type: 'Group', icon: 'square_stack_3d_down_right' },
-        { type: 'Chart', icon: 'chart_bar_square' },
-        { type: 'Webview', icon: 'globe' },
-        { type: 'Colorpicker', icon: 'drop' },
-        { type: 'Mapview', icon: 'map' },
-        { type: 'List', icon: 'square_list' },
-        { type: 'Image', icon: 'photo' },
-        { type: 'Video', icon: 'videocam' }
-      ],
-      linkableWidgetTypes: ['Sitemap', 'Text', 'Frame', 'Group', 'Image'],
-      accessControl:{}
+      newGroup:'',
+      newRole:''
     }
   },
   created () {
+    console.log('Access control')
+    const promise = this.$oh.api.getPlain('/rest/accessControl', 'text/plain')
+    promise.then((data1) => {
+      console.log(data1)
+      //accessControl = JSON.stringify(data1)
 
+    })
   },
   computed: {
-    canAddChildren () {
-      if (!this.selectedWidget) return false
-      if (this.linkableWidgetTypes.indexOf(this.selectedWidget.component) < 0) return false
-      return true
-    }
-  },
-  /* watch: {
-    sitemap: {
-      handler: function () {
-        if (!this.loading) {
-          this.dirty = true
-        }
-      },
-      deep: true
-    }
-  }, */
-  methods: {
-    onPageAfterIn () {
-      if (window) {
-        window.addEventListener('keydown', this.keyDown)
-      }
-      this.load()
-    },
-    onPageBeforeOut () {
-      if (window) {
-        window.removeEventListener('keydown', this.keyDown)
-      }
-      this.detailsOpened = false
-    },
-    keyDown (ev) {
-      if (ev.keyCode === 83 && (ev.ctrlKey || ev.metaKey) && !(ev.altKey || ev.shiftKey)) {
-        this.save(!this.createMode)
-        ev.stopPropagation()
-        ev.preventDefault()
-      }
-    },
-    load () {
-      if (this.loading) return
-      this.loading = true
 
-      if (this.createMode) {
-        this.loading = false
-        this.ready = true
-      } else {
-        this.$oh.api.get('/rest/ui/components/system:role/' + this.uid).then((data) => {
-          this.$set(this, 'role', data)
-          this.$nextTick(() => {
-            this.ready = true
-            this.loading = false
-          })
-        })
+  },
+
+  methods: {
+    reviver(key, value){
+      console.log(key)
+      if (key === 'userAccessControlSet') {
+        console.log(value)
+        let users = []
+        let newUser = {
+          name:'',
+          roles:{},
+          groups:{},
+        }
+        for(let user in value){
+          newUser.name = user.name
+
+        }
+        users.push(newUser.name)
+
+        return users
       }
+      if(key === 'groups'){
+        if(Array.isArray(value)){
+          console.log(value)
+        }
+
+      }
+      if(key === 'roles'){
+
+      }
+    },
+    addGroup(){
+        this.accessControl.groups.push({group:this.newGroup , roles:[]})
+        this.newGroup = ''
+    },
+    addRole(){
+      this.accessControl.roles.push({role:this.newRole , items:[]})
+      this.newRole = ''
     },
     save (stay) {
 
       console.log('Access control')
       const promise = this.$oh.api.getPlain('/rest/accessControl', 'text/plain')
       promise.then((data1) => {
-        console.log(data1)
+        //console.log(data1)
+        let accessControlTemp = JSON.parse(data1)
+        this.accessControl = accessControlTemp
+
       })
+
       let accessControl;
       accessControl = {
         userAccessControlSet:[
@@ -295,181 +158,16 @@ export default {
             roles: ["role1", "role2"],
             groups: ["group1"]
           }],
-        groups: [{group: "group1", roles:["role1", "role2"]}, {group:["role3"], roles:["role1","role2"]}],
-        roles: [{role:"role1", items:["item1,item2"]},{role:"role2", items:["item3,item4"]},{role:"role3", items:["item3,item2"]}]
+        groups: [{group: "group1", roles:["role1", "role2"]}, {group:["group3"], roles:["role1","role2"]}],
+        roles: [{role:"role1", items:["item1","item2"]},{role:"role2", items:["item3","item4"]},{role:"role3", items:["item3","item2"]}]
       }
-      //application/json
-      this.$oh.api.put('/rest/accessControl/put',{}).then((data) => {
-        console.log('put2')
-        console.log(data)
-      })
-      this.$set(this, 'accessControl', Object.assign({}, accessControl))
-      //,
-      const promise2 = this.$oh.api.put('/rest/accessControl/put', this.accessControl)
-      promise2.then((data) => {
-        console.log('put')
-        console.log(data)
-      })
 
-      this.$oh.api.put('/rest/items/gRoom1Sensor', {}).then((data) => {
-           console.log(data)
-          })
 
       console.log('PUT PLAIN THINGS')
-      this.$oh.api.putPlain('/rest/accessControl/enable', JSON.stringify(accessControl)).then( (data) => {
-            console.log(data)
+      this.$oh.api.putPlain('/rest/accessControl/put', JSON.stringify(this.accessControl)).then( (data) => {
+            //console.log(data)
         }
       )
-      /*console.log('HEHEHEH Role')
-      const promise2 = this.$oh.api.get('/rest/accessControl/role')
-      promise2.then((data) => {
-        console.log(data)
-      })*/
-
-      /*
-      console.log('Items')
-      const promise3 = this.$oh.api.get('/rest/items')
-      promise3.then((data) => {
-        console.log(data)
-      }) */
-
-
-     /* const promiseRoles = new Promise(() => {
-        this.$oh.api.get('/rest/accessControl/role')
-      })
-
-      const promiseAccessControl = new Promise(() => {
-        this.$oh.api.get('/rest/accessControl')
-      })
-
-      const promiseItems = new Promise(() => {
-        this.$oh.api.get('/rest/items')
-      })
-      //
-      Promise.all([promiseAccessControl, promiseItems]).then(values => console.log(values))*/
-
-
-      /* if (!this.sitemap.uid) {
-        this.$f7.dialog.alert('Please give an ID to the sitemap')
-        return
-      }
-      if (!this.sitemap.config.label) {
-        this.$f7.dialog.alert('Please give a label to the sitemap')
-        return
-      }
-      if (!this.createMode && this.uid !== this.sitemap.uid) {
-        this.$f7.dialog.alert('You cannot change the ID of an existing sitemap. Duplicate it with the new ID then delete this one.')
-        return
-      }
-
-      const promise = (this.createMode)
-        ? this.$oh.api.postPlain('/rest/ui/components/system:sitemap', JSON.stringify(this.sitemap), 'text/plain', 'application/json')
-        : this.$oh.api.put('/rest/ui/components/system:sitemap/' + this.sitemap.uid, this.sitemap)
-      promise.then((data) => {
-        this.dirty = false
-        if (this.createMode) {
-          this.$f7.toast.create({
-            text: 'Sitemap created',
-            destroyOnClose: true,
-            closeTimeout: 2000
-          }).open()
-          this.load()
-          this.$f7router.navigate(this.$f7route.url.replace('/add', '/' + this.sitemap.uid), { reloadCurrent: true })
-        } else {
-          this.$f7.toast.create({
-            text: 'Sitemap updated',
-            destroyOnClose: true,
-            closeTimeout: 2000
-          }).open()
-        }
-        this.$f7.emit('sidebarRefresh', null)
-        // if (!stay) this.$f7router.back()
-      }).catch((err) => {
-        this.$f7.toast.create({
-          text: 'Error while saving sitemap: ' + err,
-          destroyOnClose: true,
-          closeTimeout: 2000
-        }).open()
-      }) */
-    },
-    cleanConfig (widget) {
-      if (widget.config) {
-        for (let key in widget.config) {
-          if (!widget.config[key]) {
-            delete widget.config[key]
-          }
-        }
-      }
-      if (widget.slots && widget.slots.widgets) {
-        widget.slots.widgets.forEach(this.cleanConfig)
-      }
-    },
-    update (value) {
-      this.selectedWidget = null
-      this.selectedWidgetParent = null
-      this.$set(this, 'role', value)
-      this.cleanConfig(this.role)
-    },
-    startEventSource () {
-
-    },
-    stopEventSource () {
-
-    },
-    removeWidget () {
-      this.selectedWidgetParent.slots.widgets.splice(this.selectedWidgetParent.slots.widgets.indexOf(this.selectedWidget), 1)
-      if (!this.selectedWidgetParent.slots.widgets.length) {
-        delete this.selectedWidgetParent.slots
-      }
-      this.selectedWidget = null
-      this.selectedWidgetParent = null
-    },
-    moveWidgetDown () {
-      let widgets = this.selectedWidgetParent.slots.widgets
-      let pos = widgets.indexOf(this.selectedWidget)
-      if (pos >= widgets.length - 1) return
-      widgets.splice(pos, 1)
-      widgets.splice(pos + 1, 0, this.selectedWidget)
-    },
-    moveWidgetUp () {
-      let widgets = this.selectedWidgetParent.slots.widgets
-      let pos = widgets.indexOf(this.selectedWidget)
-      if (pos <= 0) return
-      widgets.splice(pos, 1)
-      widgets.splice(pos - 1, 0, this.selectedWidget)
-    },
-    selectWidget (widgets) {
-      const widget = widgets[0]
-      const parentWidget = widgets[1]
-      this.selectedWidget = null
-      this.selectedWidgetParent = null
-      this.$nextTick(() => {
-        this.selectedWidget = widget
-        this.selectedWidgetParent = parentWidget
-        const detailsLink = this.$refs.detailsLink
-        const visibility = window.getComputedStyle(detailsLink.$el).visibility
-        if (!visibility || visibility !== 'hidden') {
-          this.detailsOpened = true
-        }
-      })
-    },
-    clearSelection (ev) {
-      if (ev.target && ev.currentTarget && ev.target === ev.currentTarget) {
-        this.selectedWidget = null
-        this.selectedWidgetParent = null
-      }
-    },
-    addWidget (widgetType) {
-      if (!this.selectedWidget.slots) {
-        this.$set(this.selectedWidget, 'slots', { widgets: [] })
-      }
-      const widget = {
-        component: widgetType,
-        config: {}
-      }
-      this.selectedWidget.slots.widgets.push(widget)
-      this.selectWidget([widget, this.selectedWidget])
-      this.detailsTab = 'widget'
     }
   }
 }
