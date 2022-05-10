@@ -17,6 +17,89 @@
       </f7-link>
 
     </f7-toolbar>
+    <f7-row >
+      <f7-col width="75">
+        <f7-block-title>Users</f7-block-title>
+        <f7-list v-for="user in this.accessControl.userAccessControlSet" :key="user.name" >
+          <f7-block-title>{{user.name}}</f7-block-title>
+          <f7-list-item >
+            <li >
+              Available groups for {{user.name}}:
+              <f7-list-item v-for="group in user.groups" :key="group">
+                {{group}}
+              </f7-list-item>
+              <f7-list-input
+                type="text"
+                placeholder="Add a new group"
+                clear-button
+                :value="getGroupToUserInput(group)"
+                @input="getGroupToUserInput(group) = $event.target.value"
+              >
+              </f7-list-input>
+              <f7-button @click="addGroupToUser(user.name)">Add The a new group to the user {{user.name}}</f7-button>
+            </li>
+
+          </f7-list-item>
+          <f7-list-item >
+            <li >
+              Available roles for {{user.name}}:
+              <f7-list-item v-for="role in user.roles" :key="role">
+                {{role}}
+              </f7-list-item>
+              <f7-list-input
+                type="text"
+                placeholder="Add a new role"
+                clear-button
+                :value="newRoleToUser"
+                @input="newRoleToUser = $event.target.value"
+              >
+              </f7-list-input>
+              <f7-button @click="addRoleToUser(user.name)">Add The a new role to the user {{user.name}}</f7-button>
+            </li>
+
+          </f7-list-item>
+
+        </f7-list>
+
+        <f7-block-title>Groups</f7-block-title>
+        <f7-list v-for="group in accessControl.groups" :key="group">
+          <f7-block-title>{{group.group}}</f7-block-title>
+          <f7-list-item >
+            <li >
+              Available roles for {{group.group}}:
+              <f7-list-item v-for="role in group.roles" :key="role">
+                {{role}}
+              </f7-list-item>
+              <f7-list-input
+                type="text"
+                placeholder="Add a new role"
+                clear-button
+                :value="newRoleToGroup"
+                @input="newRoleToGroup = $event.target.value"
+              >
+              </f7-list-input>
+              <f7-button @click="addRoleToGroup(group.group)">Add The a new role to the group {{group.group}}</f7-button>
+            </li>
+          </f7-list-item>
+        </f7-list>
+      </f7-col>
+
+      <f7-col width="25">
+        <f7-block-title>Available users</f7-block-title>
+        <f7-list simple-list v-for="user in this.accessControl.userAccessControlSet" :key="user.name">
+          <f7-list-item > {{ user.name }} </f7-list-item>
+        </f7-list>
+        <f7-block-title>Available Groups</f7-block-title>
+        <f7-list simple-list v-for="group in this.accessControl.groups" :key="group.group">
+          <f7-list-item > {{ group.group }} </f7-list-item>
+        </f7-list>
+        <f7-block-title>Available Roles</f7-block-title>
+        <f7-list simple-list v-for="role in this.accessControl.roles" :key="role.role">
+          <f7-list-item > {{ role.role }} </f7-list-item>
+        </f7-list>
+      </f7-col>
+    </f7-row>
+
     <f7-row>
       <f7-col-xs-9  class="left_page">
         <form @submit.prevent="addGroup">
@@ -29,18 +112,7 @@
         </form>
       </f7-col-xs-9>
       <f7-col-xs-3  class="right_page">
-        <f7-block-title>Available users</f7-block-title>
-        <f7-list simple-list title="" v-for="user in this.accessControl.userAccessControlSet">
-          <f7-list-item > {{ user.name }} </f7-list-item>
-        </f7-list>
-        <f7-block-title>Available Groups</f7-block-title>
-        <f7-list simple-list title="" v-for="group in this.accessControl.groups">
-          <f7-list-item > {{ group.group }} </f7-list-item>
-        </f7-list>
-        <f7-block-title>Available Roles</f7-block-title>
-        <f7-list simple-list title="" v-for="role in this.accessControl.roles">
-          <f7-list-item > {{ role.role }} </f7-list-item>
-        </f7-list>
+
 
       </f7-col-xs-3>
     </f7-row>
@@ -80,6 +152,9 @@ export default {
         groups: [{group: "group1", roles:["role1", "role2"]}, {group:"group3", roles:["role1","role2"]}],
         roles: [{role:"role1", items:["item1","item2"]},{role:"role2", items:["item3","item4"]},{role:"role3", items:["item3","item2"]}]
       },
+      newGroupToUser:[{groupName:'', value:''}],
+      newRoleToUser:[{roleName:'', value:''}],
+      newRoleToGroup:'',
       newGroup:'',
       newRole:''
     }
@@ -89,7 +164,7 @@ export default {
     const promise = this.$oh.api.getPlain('/rest/accessControl', 'text/plain')
     promise.then((data1) => {
       console.log(data1)
-      //accessControl = JSON.stringify(data1)
+      this.accessControl = JSON.parse(data1)
 
     })
   },
@@ -98,34 +173,7 @@ export default {
   },
 
   methods: {
-    reviver(key, value){
-      console.log(key)
-      if (key === 'userAccessControlSet') {
-        console.log(value)
-        let users = []
-        let newUser = {
-          name:'',
-          roles:{},
-          groups:{},
-        }
-        for(let user in value){
-          newUser.name = user.name
 
-        }
-        users.push(newUser.name)
-
-        return users
-      }
-      if(key === 'groups'){
-        if(Array.isArray(value)){
-          console.log(value)
-        }
-
-      }
-      if(key === 'roles'){
-
-      }
-    },
     addGroup(){
         this.accessControl.groups.push({group:this.newGroup , roles:[]})
         this.newGroup = ''
@@ -134,16 +182,55 @@ export default {
       this.accessControl.roles.push({role:this.newRole , items:[]})
       this.newRole = ''
     },
+    addGroupToUser(name){
+      const newGroup = this.newGroupToUser
+      let userTemp = this.accessControl.userAccessControlSet.find(user => user.name === name)
+      userTemp.groups.push(newGroup)
+
+      //this.accessControl.userAccessControlSet.splice(name,1)
+      //this.accessControl.userAccessControlSet.push(userTemp)
+      this.newGroupToUser = ''
+    },
+    getGroupToUserInput(group){
+      return this.newGroupToUser.find( groupName => group === groupName.groupName).value
+    },
+    setGroupToUserInput(group, newValue){
+      this.newGroupToUser.map( groupName => {
+          if(groupName.groupName === group){
+            return groupName.value = newValue
+          }
+          return groupName
+        }
+      )
+    },
+    addRoleToUser(name){
+      const newRole = this.newRoleToUser
+      let userTemp = this.accessControl.userAccessControlSet.find(user => user.name === name)
+      userTemp.roles.push(newRole)
+
+      this.accessControl.userAccessControlSet.splice(name,1)
+      this.accessControl.userAccessControlSet.push(userTemp)
+      this.newRoleToUser = ''
+    },
+    getRoleToUserInput(role){
+      return this.newRoleToUser.find( roleName => role === roleName.roleName).value
+    },
+    setRoleToUserInput(role, newValue){
+      this.newGroupToUser.map( roleName => {
+          if(roleName.roleName === role){
+            return roleName.value = newValue
+          }
+          return roleName
+        }
+      )
+    },
+    addRoleToGroup(group){
+      const getGroup = this.accessControl.groups.find(group => group.group === group)
+      getGroup.push(newGroupToUser)
+      this.newRoleToGroup = ''
+    },
     save (stay) {
 
-      console.log('Access control')
-      const promise = this.$oh.api.getPlain('/rest/accessControl', 'text/plain')
-      promise.then((data1) => {
-        //console.log(data1)
-        let accessControlTemp = JSON.parse(data1)
-        this.accessControl = accessControlTemp
-
-      })
 
       let accessControl;
       accessControl = {
@@ -161,7 +248,6 @@ export default {
         groups: [{group: "group1", roles:["role1", "role2"]}, {group:["group3"], roles:["role1","role2"]}],
         roles: [{role:"role1", items:["item1","item2"]},{role:"role2", items:["item3","item4"]},{role:"role3", items:["item3","item2"]}]
       }
-
 
       console.log('PUT PLAIN THINGS')
       this.$oh.api.putPlain('/rest/accessControl/put', JSON.stringify(this.accessControl)).then( (data) => {
