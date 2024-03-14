@@ -5,12 +5,12 @@
       <f7-page>
         <f7-link href="/" class="logo no-ripple" panel-close v-if="themeOptions.dark === 'dark'">
           <div class="logo-inner">
-            <img src="@/images/openhab-logo-white.svg" type="image/svg+xml" width="196px">
+            <img src="@/images/tvision360.jpeg" width="196px">
           </div>
         </f7-link>
         <f7-link href="/" class="logo no-ripple" panel-close v-else>
           <div class="logo-inner">
-            <img src="@/images/openhab-logo.svg" type="image/svg+xml" width="196px">
+            <img src="@/images/tvision360.jpeg" width="196px">
           </div>
         </f7-link>
         <f7-list v-if="ready">
