@@ -5,7 +5,7 @@
       Local SIP Account Settings
     </f7-button>
     <div v-if="config.enableVideo" class="video-container" :style="{ 'aspect-ratio': config.defaultVideoAspectRatio || '4/3' }">
-      <video ref="remoteVideo" autoplay playsinline class="remote-video" poster="@/images/openhab-logo.svg" />
+      <video ref="remoteVideo" autoplay playsinline class="remote-video" poster="@/images/tvision360.png" />
       <!-- Conditionally show local video when ready to prevent ugly video placeholder on Android -->
       <video v-show="showLocalVideo" ref="localVideo" autoplay playsinline muted="muted" class="local-video" />
     </div>
