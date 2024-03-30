@@ -177,7 +177,7 @@ export default {
       return this.newGroupToUser.find(groupName => group === groupName.groupName).value
     },
     setGroupToUserInput (group) {
-      this.newGroupToUser.find(groupName => group === groupName.groupName).value = group;
+      this.newGroupToUser.find(groupName => group === groupName.groupName).value = group
     },
     addRoleToUser (name) {
       const newRole = this.newRoleToUser
