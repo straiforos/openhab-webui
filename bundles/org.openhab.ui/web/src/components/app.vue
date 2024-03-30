@@ -71,6 +71,10 @@
                             :class="{ currentsection: currentUrl.indexOf('/settings/schedule') === 0 }">
                 <f7-icon slot="media" f7="calendar" color="gray" />
               </f7-list-item>
+              <f7-list-item link="/settings/access-control/" title="Access control" view=".view-main" panel-close :animate="false" no-chevron
+                            :class="{ currentsection: currentUrl.indexOf('/settings/access-control') >= 0 }">
+                <f7-icon slot="media" f7="calendar" color="gray" />
+              </f7-list-item>
             </ul>
           </li>
 
