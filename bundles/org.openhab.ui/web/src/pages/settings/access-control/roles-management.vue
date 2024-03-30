@@ -172,22 +172,9 @@ export default {
       const newGroup = this.newGroupToUser
       let userTemp = this.accessControl.userAccessControlSet.find(user => user.name === name)
       userTemp.groups.push(newGroup)
-
-      // this.accessControl.userAccessControlSet.splice(name,1)
-      // this.accessControl.userAccessControlSet.push(userTemp)
-      this.newGroupToUser = ''
     },
     getGroupToUserInput (group) {
       return this.newGroupToUser.find(groupName => group === groupName.groupName).value
-    },
-    setGroupToUserInput (group, newValue) {
-      this.newGroupToUser.map(groupName => {
-        if (groupName.groupName === group) {
-          return groupName.value = newValue
-        }
-        return groupName
-      }
-      )
     },
     addRoleToUser (name) {
       const newRole = this.newRoleToUser
@@ -198,21 +185,9 @@ export default {
       this.accessControl.userAccessControlSet.push(userTemp)
       this.newRoleToUser = ''
     },
-    getRoleToUserInput (role) {
-      return this.newRoleToUser.find(roleName => role === roleName.roleName).value
-    },
-    setRoleToUserInput (role, newValue) {
-      this.newGroupToUser.map(roleName => {
-        if (roleName.roleName === role) {
-          return roleName.value = newValue
-        }
-        return roleName
-      }
-      )
-    },
     addRoleToGroup (group) {
       const getGroup = this.accessControl.groups.find(group => group.group === group)
-      getGroup.push(newGroupToUser)
+      getGroup.push(group)
       this.newRoleToGroup = ''
     },
     save (stay) {
@@ -235,7 +210,7 @@ export default {
 
       console.log('PUT PLAIN THINGS')
       this.$oh.api.putPlain('/rest/accessControl/put', JSON.stringify(this.accessControl)).then((data) => {
-        // console.log(data)
+        console.log(data)
       }
       )
     }
