@@ -30,7 +30,7 @@
                 placeholder="Add a new group"
                 clear-button
                 :value="getGroupToUserInput(group)"
-                @input="getGroupToUserInput(group) = $event.target.value" />
+                @input="setGroupToUserInput($event.target.value)" />
               <f7-button @click="addGroupToUser(user.name)">
                 Add The a new group to the user {{ user.name }}
               </f7-button>
@@ -97,12 +97,12 @@
     <f7-row>
       <f7-col-xs-9 class="left_page">
         <form @submit.prevent="addGroup">
-          <input v-model="newGroup" placeholder="Creat a new group"> </input>
-          <button>Creat</button>
+          <input v-model="newGroup" placeholder="Create a new group"> </input>
+          <button>Create</button>
         </form>
         <form @submit.prevent="addRole">
-          <input v-model="newRole" placeholder="Creat a new role"> </input>
-          <button>Creat</button>
+          <input v-model="newRole" placeholder="Create a new role"> </input>
+          <button>Create</button>
         </form>
       </f7-col-xs-9>
       <f7-col-xs-3 class="right_page" />
@@ -175,6 +175,9 @@ export default {
     },
     getGroupToUserInput (group) {
       return this.newGroupToUser.find(groupName => group === groupName.groupName).value
+    },
+    setGroupToUserInput (group) {
+      this.newGroupToUser.find(groupName => group === groupName.groupName).value = group;
     },
     addRoleToUser (name) {
       const newRole = this.newRoleToUser
