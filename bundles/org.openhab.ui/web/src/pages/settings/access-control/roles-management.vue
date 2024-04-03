@@ -174,7 +174,7 @@ export default {
       userTemp.groups.push(newGroup)
     },
     getGroupToUserInput (group) {
-      return this.newGroupToUser.find(groupName => group === groupName.groupName).value
+      return this.newGroupToUser.find(groupName => group === groupName.groupName)?.value
     },
     setGroupToUserInput (group) {
       this.newGroupToUser.find(groupName => group === groupName.groupName).value = group
