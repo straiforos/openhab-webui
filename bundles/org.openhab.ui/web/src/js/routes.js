@@ -97,6 +97,7 @@ export default [
       {
         path: 'overview',
         component: HomePage,
+        beforeEnter: [enforceAdminForRoute],
         options: {
           props: {
             initialTab: 'overview'
@@ -106,6 +107,7 @@ export default [
       {
         path: 'locations',
         component: HomePage,
+        beforeEnter: [enforceAdminForRoute],
         options: {
           props: {
             initialTab: 'locations'
@@ -115,6 +117,7 @@ export default [
       {
         path: 'equipment',
         component: HomePage,
+        beforeEnter: [enforceAdminForRoute],
         options: {
           props: {
             initialTab: 'equipment'
@@ -124,6 +127,7 @@ export default [
       {
         path: 'properties',
         component: HomePage,
+        beforeEnter: [enforceAdminForRoute],
         options: {
           props: {
             initialTab: 'properties'
@@ -134,14 +138,16 @@ export default [
   },
   {
     path: '/page/:uid',
-    component: PageViewPage
+    component: PageViewPage,
+    beforeEnter: [enforceAdminForRoute],
   },
   {
     path: '/about/',
     async: loadAsync(AboutPage),
     options: {
       animate: false
-    }
+    },
+    beforeEnter: [enforceAdminForRoute]
   },
   {
     path: '/setup-wizard/',
