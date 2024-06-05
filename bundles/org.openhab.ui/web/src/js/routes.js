@@ -89,6 +89,7 @@ export default [
   {
     path: '/',
     component: HomePage,
+    beforeEnter: [enforceAdminForRoute],
     // keepAlive: true,
     options: {
       transition: 'f7-dive'
