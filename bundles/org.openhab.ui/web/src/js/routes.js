@@ -140,7 +140,7 @@ export default [
   {
     path: '/page/:uid',
     component: PageViewPage,
-    beforeEnter: [enforceAdminForRoute],
+    beforeEnter: [enforceAdminForRoute]
   },
   {
     path: '/about/',
