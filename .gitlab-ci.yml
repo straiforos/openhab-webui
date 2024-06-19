@@ -1,5 +1,9 @@
 image: circleci/openjdk:17-buster-node
 
+cache:
+  paths:
+    - .m2/repository
+
 stages:
   - install
 
@@ -8,8 +12,14 @@ variables:
 
 before_script:
   - export MAVEN_OPTS="-Xmx512m"
+  - 'echo "Private-Token: ${Deploy_Token}" "${CI_SERVER_URL}/api/v4/projects/${CI_PROJECT_ID}/packages/maven"'
+  - 'curl --header "Private-Token: ${Deploy_Token}" "${CI_SERVER_URL}/api/v4/projects/${CI_PROJECT_ID}/packages/maven"'
+
 
 install_openhab_webui:
   stage: install
   script:
-    - mvn $MAVEN_CLI_OPTS clean install -DskipChecks -DskipTests -Dmaven.test.skip=true -Dfeatures.verify.skip=true -Dspotless.check.skip=true
+    - mvn $MAVEN_CLI_OPTS clean install -DskipChecks -DskipTests -Dmaven.test.skip=true -Dfeatures.verify.skip=true -Dspotless.check.skip=true -s ci_settings.xml
+  artifacts:
+    paths:
+      - bundles/org.openhab.*/target
