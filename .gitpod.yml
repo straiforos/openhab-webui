@@ -6,6 +6,10 @@
 image: circleci/openjdk:17-buster-node
 
 tasks:
-  - init: mvn install -DskipTests=false -s ci_settings.xml
-
-
+  - init: |
+      echo "Setting up environment variables..."
+      echo "CI_SERVER_URL=https://gitlab.com" >> /workspace/.env
+      echo "CI_PROJECT_ID=58666355" >> /workspace/.env
+      echo "MAVEN_REPO_URL=\${CI_SERVER_URL}/api/v4/projects/\${CI_PROJECT_ID}/packages/maven" >> /workspace/.env
+      export $(cat /workspace/.env | xargs)
+      mvn install -DskipTests=false -s ci_settings.xml
