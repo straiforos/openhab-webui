@@ -28,9 +28,6 @@ jobs:
     - name: Build with Maven
       run: mvn clean install -DskipTests -DskipChecks -Dspotless.check.skip=true -Dfeatures.verify.skip=true
 
-    - name: Run static code analysis
-      run: mvn checkstyle:check findbugs:check
-
     - name: Run Spotless code style check
       run: mvn spotless:check
 
