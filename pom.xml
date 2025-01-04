@@ -37,27 +37,27 @@
   </modules>
 
   <scm>
-    <connection>scm:git:https://repo.tvision360.io/TVision360/openhab-webui.git</connection>
-    <developerConnection>scm:git:https://repo.tvision360.io/TVision360/openhab-webui.git</developerConnection>
+    <connection>scm:git:https://github.com/straiforos/openhab-webui.git</connection>
+    <developerConnection>scm:git:https://github.com/straiforos/openhab-webui.git</developerConnection>
     <tag>HEAD</tag>
-    <url>https://repo.tvision360.io/TVision360/openhab-webui</url>
+    <url>https://github.com/straiforos/openhab-webui</url>
   </scm>
 
   <issueManagement>
-    <system>gitea</system>
-    <url>https://repo.tvision360.io/TVision360/openhab-webui/issues</url>
+    <system>github</system>
+    <url>https://github.com/straiforos/openhab-webui/issues</url>
   </issueManagement>
 
   <distributionManagement>
     <repository>
-      <id>tvision360-releases</id>
-      <name>TVision360 Maven Release Repository</name>
-      <url>${tvision360.repo.url}</url>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/straiforos/openhab-webui</url>
     </repository>
     <snapshotRepository>
-      <id>tvision360-snapshots</id>
-      <name>TVision360 Maven Snapshot Repository</name>
-      <url>${tvision360.repo.url}</url>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/straiforos/openhab-webui</url>
     </snapshotRepository>
   </distributionManagement>
 
