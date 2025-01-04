@@ -19,8 +19,8 @@
   <description>This project contains the user interfaces of openHAB</description>
 
   <organization>
-    <name>openHAB.org</name>
-    <url>https://www.openhab.org</url>
+    <name>TVision360</name>
+    <url>https://www.tvision360.io</url>
   </organization>
 
   <licenses>
@@ -37,25 +37,27 @@
   </modules>
 
   <scm>
-    <connection>scm:git:https://github.com/openhab/openhab-webui.git</connection>
-    <developerConnection>scm:git:https://github.com/openhab/openhab-webui.git</developerConnection>
+    <connection>scm:git:https://github.com/straiforos/openhab-webui.git</connection>
+    <developerConnection>scm:git:https://github.com/straiforos/openhab-webui.git</developerConnection>
     <tag>HEAD</tag>
-    <url>https://github.com/openhab/openhab-webui</url>
+    <url>https://github.com/straiforos/openhab-webui</url>
   </scm>
 
   <issueManagement>
-    <system>GitHub</system>
-    <url>https://github.com/openhab/openhab-webui/issues</url>
+    <system>github</system>
+    <url>https://github.com/straiforos/openhab-webui/issues</url>
   </issueManagement>
 
   <distributionManagement>
     <repository>
-      <id>jfrog-release</id>
-      <url>${oh.repo.distBaseUrl}/libs-release-local</url>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/straiforos/openhab-webui</url>
     </repository>
     <snapshotRepository>
-      <id>jfrog</id>
-      <url>${oh.repo.snapshotBaseUrl}/libs-snapshot-local</url>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/straiforos/openhab-webui</url>
     </snapshotRepository>
   </distributionManagement>
 
@@ -77,6 +79,8 @@
     <!-- Eclipse Java formatter version 4.26+ does not check test files -->
     <spotless.eclipse.version>4.25</spotless.eclipse.version>
     <spotless.eclipse.wtp.version>4.21.0</spotless.eclipse.wtp.version>
+
+    <tvision360.repo.url>https://repo.tvision360.io/api/packages/tvision360/maven</tvision360.repo.url>
   </properties>
 
   <build>

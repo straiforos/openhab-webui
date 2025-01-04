@@ -1,0 +1,27 @@
+image: circleci/openjdk:17-buster-node
+
+cache:
+  paths:
+    - .m2/repository
+
+stages:
+  - install
+
+variables:
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+  TVISION360_GROUP_ID: "86358211"
+  MAVEN_REPO_URL: "${CI_SERVER_URL}/api/v4/groups/${TVISION360_GROUP_ID}/-/packages/maven"
+
+before_script:
+  - export MAVEN_OPTS="-Xmx512m"
+  - 'echo "Private-Token: ${Deploy_Token}" "${MAVEN_REPO_URL}"'
+  - 'curl --header "Private-Token: ${Deploy_Token}" "${MAVEN_REPO_URL}/org/openhab/openhab-super-pom/maven-metadata.xml"'
+
+
+install_openhab_webui:
+  stage: install
+  script:
+    - mvn $MAVEN_CLI_OPTS clean install -DskipChecks -DskipTests -Dmaven.test.skip=true -Dfeatures.verify.skip=true -Dspotless.check.skip=true -s ci_settings.xml
+  artifacts:
+    paths:
+      - bundles/org.openhab.*/target
